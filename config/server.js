@@ -2,7 +2,7 @@ const express = require('express');
 
 const consign = require('consign');
 
-const bodyParser = require('body-gparser');
+const bodyParser = require('body-parser');
 
 const app = express();
 
