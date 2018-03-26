@@ -1,32 +1,35 @@
 const Produto = require('../models/Produto');
 
 module.exports = class ProdutoDAO {
-  constructor(connection) {
-    this.connection = connection;
+  constructor(mongoClient) {
+    this.mongoClient = mongoClient;
+  }
+
+  get db() {
+    return this.mongoClient.db('piccoli');
+  }
+
+  close() {
+    this.mongoClient.close();
   }
 
   listarProdutos() {
-    console.log(this.connection);
     return new Promise((resolve, reject) => {
-      const produtos = [
-        new Produto('Titulo 1', 'descricao1', 'link1', 'Ativo', 1, undefined, '123'),
-        new Produto('Titulo 2', 'descricao2', 'link2', 'Edicao', 2, undefined, '456'),
-      ];
-      if (!produtos) {
-        reject(new Error('sem produtos'));
-      }
-      resolve(produtos);
+      const col = this.db.collection('produtos');
+      col.find({}).toArray((err, prods) => {
+        if (err) reject(err);
+        resolve(prods);
+      });
     });
   }
 
   listarProdutosAtivos() {
-    console.log(this.connection);
     return new Promise((resolve, reject) => {
-      const produtos = [new Produto('Titulo 1', 'descricao1', 'link1', 'Ativo', 1, undefined, '123')];
-      if (!produtos) {
-        reject(new Error('sem produtos'));
-      }
-      resolve(produtos);
+      const col = this.db.collection('produtos');
+      col.find({ status: 'ativo' }).toArray((err, prods) => {
+        if (err) reject(err);
+        resolve(prods);
+      });
     });
   }
 };
