@@ -1,4 +1,4 @@
-const Produto = require('../models/Produto');
+const { ObjectId } = require('mongodb');
 
 module.exports = class ProdutoDAO {
   constructor(mongoClient) {
@@ -30,6 +30,35 @@ module.exports = class ProdutoDAO {
         if (err) reject(err);
         resolve(prods);
       });
+    });
+  }
+
+  incluiProduto(produto) {
+    return new Promise((resolve, reject) => {
+      this.db
+        .collection('produtos')
+        .insertOne(produto)
+        .then((result) => {
+          resolve(result.insertedId.toHexString());
+        })
+        .catch((err) => {
+          reject(err);
+        });
+    });
+  }
+
+  getProduto(id) {
+    return new Promise((resolve, reject) => {
+      this.db
+        .collection('produtos')
+        .find({ _id: new ObjectId(id) })
+        .toArray((err, produto) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve(produto[0]);
+        });
     });
   }
 };

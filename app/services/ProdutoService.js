@@ -19,11 +19,19 @@ module.exports = class ProdutoService {
       });
   }
 
-  static incluiProduto() {
+  static incluiProduto(produto) {
     return clientFactory()
       .then((client) => {
         const produtoDAO = new ProdutoDAO(client);
-        return produtoDAO.incluiProduto();
+        return produtoDAO.incluiProduto(produto);
+      });
+  }
+
+  static getProduto(id) {
+    return clientFactory()
+      .then((client) => {
+        const produtoDAO = new ProdutoDAO(client);
+        return produtoDAO.getProduto(id);
       });
   }
   static validaProduto(isAlteracao) {
