@@ -1,5 +1,6 @@
 const { ObjectId } = require('mongodb');
 
+/* eslint-disable  no-underscore-dangle */
 module.exports = class ProdutoDAO {
   constructor(mongoClient) {
     this.mongoClient = mongoClient;
@@ -60,5 +61,22 @@ module.exports = class ProdutoDAO {
           resolve(produto[0]);
         });
     });
+  }
+
+  atualizaProduto(produto) {
+    return this.db
+      .collection('produtos')
+      .updateOne(
+        { _id: new ObjectId(produto._id) },
+        {
+          $set: {
+            titulo: produto.titulo,
+            descricao: produto.descricao,
+            status: produto.status,
+            link: produto.link,
+            imagens: produto.imagens,
+          },
+        },
+      );
   }
 };

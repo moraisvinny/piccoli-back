@@ -2,7 +2,7 @@ const Produto = require('../models/Produto');
 
 const ProdutoService = require('../services/ProdutoService');
 
-const { check, validationResult } = require('express-validator/check');
+const { validationResult } = require('express-validator/check');
 
 module.exports = (app) => {
   app.get('/produtos', (req, res) => {
@@ -26,16 +26,34 @@ module.exports = (app) => {
   app.get('/produtos/produto/:id', (req, res) => {
     ProdutoService
       .getProduto(req.params.id)
-      .then(produto => res.json(produto))
+      .then((produto) => {
+        if (!produto) {
+          res.status(404).json({ msg: 'Produto nao encontrado' });
+          return;
+        }
+        res.json(produto);
+      })
       .catch((err) => {
-        console.log(err);
-        res.status(404).send('Produto nao encontrado');
+        res.status(500).json({ msg: 'Ocorreu um erro', error: err.message });
       });
+  });
+
+  app.put('/produtos/produto/:id', (req, res) => {
+    const { id } = req.params;
+    ProdutoService.atualizaProduto(new Produto(
+      req.body.titulo,
+      req.body.descricao,
+      req.body.link,
+      req.body.status,
+      req.body.imagens,
+      id,
+    ));
+    res.send(`OK ${id}`);
   });
 
   app.post(
     '/produtos/produto',
-    ProdutoService.validaProduto(false), // express-validator
+    ProdutoService.validaProduto(), // express-validator
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

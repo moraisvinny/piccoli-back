@@ -5,36 +5,30 @@ const { check } = require('express-validator/check');
 module.exports = class ProdutoService {
   static listarProdutos() {
     return clientFactory()
-      .then((client) => {
-        const produtoDAO = new ProdutoDAO(client);
-        return produtoDAO.listarProdutos();
-      });
+      .then(client => new ProdutoDAO(client).listarProdutos());
   }
 
   static listarProdutosAtivos() {
     return clientFactory()
-      .then((client) => {
-        const produtoDAO = new ProdutoDAO(client);
-        return produtoDAO.listarProdutosAtivos();
-      });
+      .then(client => new ProdutoDAO(client).listarProdutosAtivos());
   }
 
   static incluiProduto(produto) {
     return clientFactory()
-      .then((client) => {
-        const produtoDAO = new ProdutoDAO(client);
-        return produtoDAO.incluiProduto(produto);
-      });
+      .then(client => new ProdutoDAO(client).incluiProduto(produto));
   }
 
   static getProduto(id) {
     return clientFactory()
-      .then((client) => {
-        const produtoDAO = new ProdutoDAO(client);
-        return produtoDAO.getProduto(id);
-      });
+      .then(client => new ProdutoDAO(client).getProduto(id));
   }
-  static validaProduto(isAlteracao) {
+
+  static atualizaProduto(produto) {
+    return clientFactory()
+      .then(client => new ProdutoDAO(client).atualizaProduto(produto));
+  }
+
+  static validaProduto() {
     const validacoes = [
       check('titulo', 'Titulo deve possuir no minimo 3 caracteres')
         .isLength({ min: 3 }),
@@ -57,9 +51,6 @@ module.exports = class ProdutoService {
           resolve();
         })),
     ];
-    if (isAlteracao) {
-      validacoes.push(check('id', 'Nao foi possivel identificar o produto').exists());
-    }
     return validacoes;
   }
 };
