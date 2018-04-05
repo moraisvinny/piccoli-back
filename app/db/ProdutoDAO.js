@@ -7,7 +7,7 @@ module.exports = class ProdutoDAO {
   }
 
   get db() {
-    return this.mongoClient.db('piccoli');
+    return this.mongoClient.db('heroku_mmnc7zzf');
   }
 
   close() {
