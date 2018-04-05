@@ -4,7 +4,7 @@ let cliente = null;
 
 module.exports = () => {
   // Connection URL
-  const url = 'mongodb://localhost:27017';
+  const url = process.env.MONGODB_URI || 'mongodb://localhost:27017';
   const mongoClient = mongo.MongoClient;
   return new Promise((resolve, reject) => {
     if (cliente) {
