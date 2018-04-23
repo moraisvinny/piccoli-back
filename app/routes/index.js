@@ -23,6 +23,8 @@ module.exports = (app) => {
   });
 
   app.post('/captcha', (req, res) => {
+    res.header('Access-Control-Allow-Origin', '*');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     const client = clients.createJsonClient({
       url: 'https://www.google.com',
     });
