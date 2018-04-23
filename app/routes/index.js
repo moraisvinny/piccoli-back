@@ -1,3 +1,5 @@
+const clients = require('restify-clients');
+
 module.exports = (app) => {
   app.get('/', (req, res) => {
     const retorno = 'Bem vindo a API de Piccoli Vestiti';
@@ -17,6 +19,20 @@ module.exports = (app) => {
           }],
         });
       },
+    });
+  });
+
+  app.post('/captcha', (req, res) => {
+    const client = clients.createJsonClient({
+      url: 'https://www.google.com',
+    });
+
+    const secret = '6Lf0E0oUAAAAAOlAIN9sTNF9hyVGpG2cPYG7SLi6';
+
+    const url = `/recaptcha/api/siteverify?secret=${secret}&response=${req.body.captchaResponse}`;
+
+    client.get(url, (err, reqPost, resPost, obj) => {
+      res.send(obj);
     });
   });
 };
