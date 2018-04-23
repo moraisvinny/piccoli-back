@@ -23,8 +23,6 @@ module.exports = (app) => {
   });
 
   app.post('/captcha', (req, res) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
     const client = clients.createJsonClient({
       url: 'https://www.google.com',
     });
@@ -32,7 +30,7 @@ module.exports = (app) => {
     const secret = '6Lf0E0oUAAAAAOlAIN9sTNF9hyVGpG2cPYG7SLi6';
 
     const url = `/recaptcha/api/siteverify?secret=${secret}&response=${req.body.captchaResponse}`;
-
+    console.log(req.body);
     client.get(url, (err, reqPost, resPost, obj) => {
       res.send(obj);
     });
