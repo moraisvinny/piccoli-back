@@ -43,13 +43,13 @@ module.exports = class ProdutoService {
         })),
       check('link', 'Link nao eh uma URL valida')
         .isURL(),
-      check('imagens', 'E necessario informar ao menos uma imagem')
-        .custom(value => new Promise((resolve, reject) => {
-          if (value.length < 1 || typeof value !== 'object') {
-            reject();
-          }
-          resolve();
-        })),
+      // check('imagens', 'E necessario informar ao menos uma imagem')
+      //   .custom(value => new Promise((resolve, reject) => {
+      //     if (value.length < 1 || typeof value !== 'object') {
+      //       reject();
+      //     }
+      //     resolve();
+      //   })),
     ];
     return validacoes;
   }
