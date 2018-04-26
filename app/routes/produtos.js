@@ -48,7 +48,7 @@ module.exports = (app) => {
       req.body.imagens,
       id,
     ));
-    res.send(`OK ${id}`);
+    res.json({ msg: 'produto alterado com sucesso' });
   });
 
   app.post(
@@ -68,6 +68,7 @@ module.exports = (app) => {
         req.body.imagens,
       )).then(id => res.status(201).json({
         msg: 'produto inserido com sucesso',
+        id,
         links: [
           {
             href: `/produtos/produto/${id}`,

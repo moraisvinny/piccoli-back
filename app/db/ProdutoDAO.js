@@ -77,6 +77,7 @@ module.exports = class ProdutoDAO {
             imagens: produto.imagens,
           },
         },
+        { upsert: true },
       );
   }
 };
