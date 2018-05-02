@@ -22,6 +22,12 @@ module.exports = class ProdutoService {
     return new ProdutoModel(geraProduto(body)).save();
   }
 
+  static removeProduto(id) {
+    return ProdutoModel
+      .findByIdAndRemove(id)
+      .then(result => console.log(result));
+  }
+
   static getProduto(id) {
     return ProdutoModel.findById(id);
   }

@@ -1,5 +1,3 @@
-const Produto = require('../models/Produto');
-
 const ProdutoService = require('../services/ProdutoService');
 
 const { validationResult } = require('express-validator/check');
@@ -25,9 +23,9 @@ module.exports = (app) => {
 
   app.delete('/produtos/produto/:id', (req, res) => {
     const { id } = req.params;
-    res.json({
-      msg: `produto com id ${id} removid com sucesso`,
-    });
+    ProdutoService
+      .removeProduto(id)
+      .then(() => res.json({ msg: `produto com id ${id} removid com sucesso` }));
   });
 
   app.get('/produtos/produto/:id', (req, res) => {
