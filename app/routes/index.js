@@ -30,7 +30,6 @@ module.exports = (app) => {
     const secret = '6Lf0E0oUAAAAAOlAIN9sTNF9hyVGpG2cPYG7SLi6';
 
     const url = `/recaptcha/api/siteverify?secret=${secret}&response=${req.body.captchaResponse}`;
-    console.log(req.body);
     client.get(url, (err, reqPost, resPost, obj) => {
       res.send(obj);
     });

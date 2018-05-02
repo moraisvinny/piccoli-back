@@ -23,6 +23,13 @@ module.exports = (app) => {
       });
   });
 
+  app.delete('/produtos/produto/:id', (req, res) => {
+    const { id } = req.params;
+    res.json({
+      msg: `produto com id ${id} removid com sucesso`,
+    });
+  });
+
   app.get('/produtos/produto/:id', (req, res) => {
     ProdutoService
       .getProduto(req.params.id)
@@ -40,15 +47,10 @@ module.exports = (app) => {
 
   app.put('/produtos/produto/:id', (req, res) => {
     const { id } = req.params;
-    ProdutoService.atualizaProduto(new Produto(
-      req.body.titulo,
-      req.body.descricao,
-      req.body.link,
-      req.body.status,
-      req.body.imagens,
-      id,
-    ));
-    res.json({ msg: 'produto alterado com sucesso' });
+    ProdutoService
+      .atualizaProduto(id, req.body)
+      .then(() => res.json({ msg: 'produto alterado com sucesso' }))
+      .catch(err => res.status(500).json({ msg: 'Ocorreu um erro', error: err.message }));
   });
 
   app.post(
@@ -60,23 +62,19 @@ module.exports = (app) => {
         res.status(422).json({ errors: errors.mapped() });
         return;
       }
-      ProdutoService.incluiProduto(new Produto(
-        req.body.titulo,
-        req.body.descricao,
-        req.body.link,
-        req.body.status,
-        req.body.imagens,
-      )).then(id => res.status(201).json({
-        msg: 'produto inserido com sucesso',
-        id,
-        links: [
-          {
-            href: `/produtos/produto/${id}`,
-            rel: 'obter produto',
-            method: 'GET',
-          },
-        ],
-      }));
+      ProdutoService
+        .incluiProduto(req.body)
+        .then(id => res.status(201).json({
+          msg: 'produto inserido com sucesso',
+          id,
+          links: [
+            {
+              href: `/produtos/produto/${id}`,
+              rel: 'obter produto',
+              method: 'GET',
+            },
+          ],
+        }));
     },
   );
 };

@@ -1,31 +1,42 @@
-const ProdutoDAO = require('../db/ProdutoDAO');
-const clientFactory = require('../db/connectionFactory');
 const { check } = require('express-validator/check');
+const ProdutoModel = require('../models/Produto');
 
+function geraProduto(body) {
+  return {
+    titulo: body.titulo,
+    descricao: body.descricao,
+    status: body.status,
+    link: body.link,
+    imagens: body.imagens,
+  };
+}
 module.exports = class ProdutoService {
   static listarProdutos() {
-    return clientFactory()
-      .then(client => new ProdutoDAO(client).listarProdutos());
+    return ProdutoModel.find();
   }
 
   static listarProdutosAtivos() {
-    return clientFactory()
-      .then(client => new ProdutoDAO(client).listarProdutosAtivos());
+    return ProdutoModel.find({ status: 'ativo' });
   }
-
-  static incluiProduto(produto) {
-    return clientFactory()
-      .then(client => new ProdutoDAO(client).incluiProduto(produto));
+  static incluiProduto(body) {
+    return new ProdutoModel(geraProduto(body)).save();
   }
 
   static getProduto(id) {
-    return clientFactory()
-      .then(client => new ProdutoDAO(client).getProduto(id));
+    return ProdutoModel.findById(id);
   }
-
-  static atualizaProduto(produto) {
-    return clientFactory()
-      .then(client => new ProdutoDAO(client).atualizaProduto(produto));
+  /* eslint-disable  no-param-reassign */
+  static atualizaProduto(id, body) {
+    return ProdutoModel
+      .findById(id)
+      .then((prodBanco) => {
+        prodBanco.titulo = body.titulo;
+        prodBanco.descricao = body.descricao;
+        prodBanco.status = body.status;
+        prodBanco.link = body.link;
+        prodBanco.imagens = body.imagens;
+        return prodBanco.save();
+      });
   }
 
   static validaProduto() {
