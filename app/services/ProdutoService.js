@@ -1,5 +1,6 @@
 const { check } = require('express-validator/check');
 const ProdutoModel = require('../models/Produto');
+const cloudinary = require('cloudinary');
 
 function geraProduto(body) {
   return {
@@ -18,14 +19,33 @@ module.exports = class ProdutoService {
   static listarProdutosAtivos() {
     return ProdutoModel.find({ status: 'ativo' });
   }
-  static incluiProduto(body) {
-    return new ProdutoModel(geraProduto(body)).save();
+  static incluiProduto(req) {
+    return new Promise((resolve, reject) => {
+      req.files.imagem.mv('./imagem', (errMv) => {
+        if (errMv) {
+          reject(errMv);
+          return;
+        }
+        cloudinary.uploader.upload('./imagem', (result) => {
+          if (!result.url) {
+            reject(new Error('erro no upload da imagem'));
+            return;
+          }
+          req.body.imagens = [];
+          req.body.imagens.push(result.url);
+          new ProdutoModel(geraProduto(req.body))
+            .save()
+            .then((resultSave) => {
+              resolve(resultSave);
+            });
+        });
+      });
+    });
   }
 
   static removeProduto(id) {
     return ProdutoModel
-      .findByIdAndRemove(id)
-      .then(result => console.log(result));
+      .findByIdAndRemove(id);
   }
 
   static getProduto(id) {

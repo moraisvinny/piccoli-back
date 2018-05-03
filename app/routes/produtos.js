@@ -61,7 +61,7 @@ module.exports = (app) => {
         return;
       }
       ProdutoService
-        .incluiProduto(req.body)
+        .incluiProduto(req)
         .then(id => res.status(201).json({
           msg: 'produto inserido com sucesso',
           id,
