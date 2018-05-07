@@ -11,6 +11,43 @@ function geraProduto(body) {
     imagens: body.imagens,
   };
 }
+
+function upload(req) {
+  return new Promise((resolve, reject) => {
+    req.files.imagem.mv('./imagem', (errMv) => {
+      if (errMv) {
+        reject(errMv);
+        return;
+      }
+      cloudinary.uploader.upload('./imagem', (result) => {
+        if (!result.url) {
+          reject(new Error('erro no upload da imagem'));
+          return;
+        }
+        req.body.imagens = [];
+        req.body.imagens.push(result.url);
+        resolve();
+      });
+    });
+  });
+}
+
+function removeImagem(url) {
+  return new Promise((resolve, reject) => {
+    cloudinary.v2.uploader
+      .destroy(
+        url.match(/\w*\./g).pop().split('.')[0],
+        (err) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          resolve();
+        },
+      );
+  });
+}
+
 module.exports = class ProdutoService {
   static listarProdutos() {
     return ProdutoModel.find();
@@ -19,50 +56,78 @@ module.exports = class ProdutoService {
   static listarProdutosAtivos() {
     return ProdutoModel.find({ status: 'ativo' });
   }
+
   static incluiProduto(req) {
     return new Promise((resolve, reject) => {
-      req.files.imagem.mv('./imagem', (errMv) => {
-        if (errMv) {
-          reject(errMv);
-          return;
-        }
-        cloudinary.uploader.upload('./imagem', (result) => {
-          if (!result.url) {
-            reject(new Error('erro no upload da imagem'));
-            return;
-          }
-          req.body.imagens = [];
-          req.body.imagens.push(result.url);
+      upload(req)
+        .then(() => {
           new ProdutoModel(geraProduto(req.body))
             .save()
-            .then((resultSave) => {
-              resolve(resultSave);
-            });
-        });
-      });
+            .then(resultSave => resolve(resultSave))
+            .catch(errModel => reject(errModel));
+        })
+        .catch(err => reject(err));
     });
   }
 
   static removeProduto(id) {
-    return ProdutoModel
-      .findByIdAndRemove(id);
+    return new Promise((resolve, reject) => {
+      ProdutoModel
+        .findById(id)
+        .then((produto) => {
+          if (!produto) {
+            reject(new Error('Produto nao encontrado'));
+            return;
+          }
+          produto.imagens.forEach((imagem) => {
+            removeImagem(imagem)
+              .catch(err => reject(err));
+          });
+          ProdutoModel.remove({ _id: id })
+            .then((resultRem) => {
+              resolve(resultRem);
+            })
+            .catch(errRem => reject(errRem));
+        });
+    });
   }
 
   static getProduto(id) {
     return ProdutoModel.findById(id);
   }
   /* eslint-disable  no-param-reassign */
-  static atualizaProduto(id, body) {
-    return ProdutoModel
-      .findById(id)
-      .then((prodBanco) => {
-        prodBanco.titulo = body.titulo;
-        prodBanco.descricao = body.descricao;
-        prodBanco.status = body.status;
-        prodBanco.link = body.link;
-        prodBanco.imagens = body.imagens;
-        return prodBanco.save();
-      });
+  static atualizaProduto(id, req) {
+    // 1- obtem por id
+    // 2- remove as imagens antigas da cloud
+    // 3- insere as imagens novas na cloud
+    // 4- atualiza registro no banco
+
+    return new Promise((resolve, reject) => {
+      ProdutoModel
+        .findById(id)
+        .then((prodBanco) => {
+          prodBanco.imagens.forEach((imagem) => {
+            removeImagem(imagem)
+              .then(() => console.log(`imagem ${imagem} removida`))
+              .catch((errDel) => {
+                reject(errDel);
+              });
+          });
+          upload(req).then(() => {
+            prodBanco.titulo = req.body.titulo;
+            prodBanco.descricao = req.body.descricao;
+            prodBanco.status = req.body.status;
+            prodBanco.link = req.body.link;
+            prodBanco.imagens = req.body.imagens;
+            prodBanco
+              .save()
+              .then(() => resolve());
+          }).catch((errUp) => {
+            console.log(errUp);
+            reject(errUp);
+          });
+        });
+    });
   }
 
   static validaProduto() {

@@ -25,7 +25,8 @@ module.exports = (app) => {
     const { id } = req.params;
     ProdutoService
       .removeProduto(id)
-      .then(() => res.json({ msg: `produto com id ${id} removid com sucesso` }));
+      .then(() => res.json({ msg: `produto com id ${id} removid com sucesso` }))
+      .catch(err => res.status(500).json({ msg: 'Ocorreu um erro ao excluir', error: err }));
   });
 
   app.get('/produtos/produto/:id', (req, res) => {
@@ -46,7 +47,7 @@ module.exports = (app) => {
   app.put('/produtos/produto/:id', (req, res) => {
     const { id } = req.params;
     ProdutoService
-      .atualizaProduto(id, req.body)
+      .atualizaProduto(id, req)
       .then(() => res.json({ msg: 'produto alterado com sucesso' }))
       .catch(err => res.status(500).json({ msg: 'Ocorreu um erro', error: err.message }));
   });
