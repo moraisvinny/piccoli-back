@@ -8,7 +8,7 @@ const db = mongoose.connection;
 db.on('error', console.error.bind(console, 'connection error:'));
 
 // Conectou
-db.once('open', () => console.log('mongoose conectou'));
+db.once('open', () => console.log(`mongoose conectou em ${url}`));
 
 // When the connection is disconnected
 mongoose.connection.on('disconnected', () => console.log('Mongoose default connection disconnected'));
