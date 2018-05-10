@@ -1,15 +1,20 @@
 const ProdutoService = require('../services/ProdutoService');
-
+const UsuarioService = require('../services/UsuarioService');
 const { validationResult } = require('express-validator/check');
 
 module.exports = (app) => {
-  app.get('/produtos', (req, res) => {
-    ProdutoService
-      .listarProdutos()
-      .then((produtos) => {
-        res.json(produtos);
-      });
-  });
+  app.get(
+    '/produtos',
+    (req, res, next) => {
+      UsuarioService.validaToken(req, res, next);
+    }, (req, res) => {
+      ProdutoService
+        .listarProdutos()
+        .then((produtos) => {
+          res.json(produtos);
+        });
+    },
+  );
 
   app.get('/produtos/ativos', (req, res) => {
     res.header('Access-Control-Allow-Origin', '*');
