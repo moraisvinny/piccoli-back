@@ -2,8 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const usuarioSchema = mongoose.Schema({
-  nome: String,
-  email: String,
+  email: {
+    type: String,
+    index: true,
+    unique: true,
+  },
   senha: String,
   perfil: String,
 });
@@ -24,5 +27,21 @@ usuarioSchema.pre('save', function (next) {
   });
 });
 
+usuarioSchema.methods.validaSenha = function (senhaDigitada) {
+  return new Promise((resolve, reject) => {
+    bcrypt.compare(senhaDigitada, this.senha, (err, res) => {
+      if (err) return reject(err);
+      return resolve(res);
+    });
+  });
+};
+
+usuarioSchema.statics.geraUsuario = function (body) {
+  return {
+    senha: body.senha,
+    email: body.email,
+    perfil: body.perfil,
+  };
+};
 const usuarioModel = mongoose.model('Usuario', usuarioSchema);
 module.exports = usuarioModel;
