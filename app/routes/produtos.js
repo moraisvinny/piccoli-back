@@ -26,13 +26,19 @@ module.exports = (app) => {
       });
   });
 
-  app.delete('/produtos/produto/:id', (req, res) => {
-    const { id } = req.params;
-    ProdutoService
-      .removeProduto(id)
-      .then(() => res.json({ msg: `produto com id ${id} removid com sucesso` }))
-      .catch(err => res.status(500).json({ msg: 'Ocorreu um erro ao excluir', error: err }));
-  });
+  app.delete(
+    '/produtos/produto/:id',
+    (req, res, next) => {
+      UsuarioService.validaToken(req, res, next);
+    },
+    (req, res) => {
+      const { id } = req.params;
+      ProdutoService
+        .removeProduto(id)
+        .then(() => res.json({ msg: `produto com id ${id} removid com sucesso` }))
+        .catch(err => res.status(500).json({ msg: 'Ocorreu um erro ao excluir', error: err }));
+    },
+  );
 
   app.get('/produtos/produto/:id', (req, res) => {
     ProdutoService
@@ -49,17 +55,26 @@ module.exports = (app) => {
       });
   });
 
-  app.put('/produtos/produto/:id', (req, res) => {
-    const { id } = req.params;
-    ProdutoService
-      .atualizaProduto(id, req)
-      .then(() => res.json({ msg: 'produto alterado com sucesso' }))
-      .catch(err => res.status(500).json({ msg: 'Ocorreu um erro', error: err.message }));
-  });
+  app.put(
+    '/produtos/produto/:id',
+    (req, res, next) => {
+      UsuarioService.validaToken(req, res, next);
+    },
+    (req, res) => {
+      const { id } = req.params;
+      ProdutoService
+        .atualizaProduto(id, req)
+        .then(() => res.json({ msg: 'produto alterado com sucesso' }))
+        .catch(err => res.status(500).json({ msg: 'Ocorreu um erro', error: err.message }));
+    },
+  );
 
   app.post(
     '/produtos/produto',
-    ProdutoService.validaProduto(), // express-validator
+    (req, res, next) => {
+      UsuarioService.validaToken(req, res, next);
+      ProdutoService.validaProduto(); // express-validator
+    },
     (req, res) => {
       const errors = validationResult(req);
       if (!errors.isEmpty()) {

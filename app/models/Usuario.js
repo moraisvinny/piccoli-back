@@ -2,6 +2,11 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 
 const usuarioSchema = mongoose.Schema({
+  usuario: {
+    type: String,
+    index: true,
+    unique: true,
+  },
   email: {
     type: String,
     index: true,
@@ -38,6 +43,7 @@ usuarioSchema.methods.validaSenha = function (senhaDigitada) {
 
 usuarioSchema.statics.geraUsuario = function (body) {
   return {
+    usuario: body.usuario,
     senha: body.senha,
     email: body.email,
     perfil: body.perfil,
