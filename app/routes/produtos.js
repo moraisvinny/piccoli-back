@@ -93,7 +93,8 @@ module.exports = (app) => {
               method: 'GET',
             },
           ],
-        }));
+        }))
+        .catch(err => res.status(500).json({ msg: err }));
     },
   );
 };

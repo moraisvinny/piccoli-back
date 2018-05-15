@@ -30,11 +30,11 @@ module.exports = class UsuarioService {
   static validaToken(req, res, next) {
     const token = (req.body && req.body.access_token)
       || (req.query && req.query.access_token)
-      || req.headers['x-access-token'];
-    if (!token) return res.status(400).json({ msg: 'Token não informado' });
+      || req.headers.authorization;
+    if (!token) return res.status(400).json({ codigo: 1, msg: 'Token não informado' });
     const decoded = jwt.verify(token, segredo);
-    if (decoded.exp > Date.now()) return res.status(401).json({ msg: 'login expirado' });
-    if (decoded.perfil !== 'adm') return res.status(403).json({ msg: 'nao autorizado' });
+    if (decoded.exp > Date.now()) return res.status(401).json({ codigo: 2, msg: 'login expirado' });
+    if (decoded.perfil !== 'adm') return res.status(403).json({ codigo: 3, msg: 'nao autorizado' });
     return next();
   }
 };

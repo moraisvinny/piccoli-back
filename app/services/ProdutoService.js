@@ -66,7 +66,10 @@ module.exports = class ProdutoService {
             .then(resultSave => resolve(resultSave))
             .catch(errModel => reject(errModel));
         })
-        .catch(err => reject(err));
+        .catch((err) => {
+          console.log(err);
+          reject(err);
+        });
     });
   }
 
